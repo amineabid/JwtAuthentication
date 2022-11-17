@@ -1,0 +1,103 @@
+﻿@page "/register"
+
+@if (_registerSuccesful == false)
+{
+    <EditForm Model="_userToRegister" OnValidSubmit="RegisterUser" OnInvalidSubmit="RegisterUser">
+        <DataAnnotationsValidator/>
+        <div class="form-group my-3">
+            <label for="nom">Nom</label>
+            <InputText @bind-Value="_userToRegister.Nom" id="nom" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Nom)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="city">City</label>
+            <InputText @bind-Value="_userToRegister.City" id="city" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.City)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="email">Email Adresse</label>
+            <InputText @bind-Value="_userToRegister.Email" id="email" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Email)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="tel">Tel</label>
+            <InputText @bind-Value="_userToRegister.PhoneNumber" id="tel" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.PhoneNumber)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="dateNaiss">Date de Naissance</label>
+            <InputDate @bind-Value="_userToRegister.DateOfBirth" id="dateNaiss" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.DateOfBirth)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="password">Password</label>
+            <InputText @bind-Value="_userToRegister.Password" type="password" id="password" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Password)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="confirmepassword">ConfirmPassword</label>
+            <InputText @bind-Value="_userToRegister.ConfirmPassword" type="password" id="confirmepassword" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.ConfirmPassword)" />
+        </div>
+        <ValidationSummary/>
+        <input type="submit" class="btn btn-primary" value="Register" />
+        @if (_attemptToRegisterFailed)
+        {
+            <p class="my-3 text-danger">@_attemptToRegisterFailedErrorMessage</p>
+        }
+    </EditForm>
+}
+else
+{
+    <h4>Register Succesful</h4>
+    <a href="/singnin" class="">Sign In</a>
+}
+@code {
+    [Inject] HttpClient HttpClient { get; set; }
+    private SignUpDto _userToRegister = new SignUpDto();
+    private bool _registerSuccesful = false;
+    private bool _attemptToRegisterFailed = false;
+    private string _attemptToRegisterFailedErrorMessage = null;
+    private async Task RegisterUser()
+    {
+        _attemptToRegisterFailed = false;
+        HttpResponseMessage httpResponseMessage = await HttpClient.PostAsJsonAsync("https://localhost:7129/api/Users/register", _userToRegister);
+        if (httpResponseMessage.IsSuccessStatusCode)
+        {
+            _registerSuccesful = true;
+        }
+        else
+        {
+            string serverErrorMessage = await httpResponseMessage.Content.ReadAsStringAsync();
+            _attemptToRegisterFailed = true;
+            _attemptToRegisterFailedErrorMessage = $"{serverErrorMessage} please change your input and try again. ";
+        }
+    }
+}
+@*
+        <div class="form-group my-3">
+            <label for="nom">Nom</label>
+            <InputText @bind-Value="_userToRegister" id="nom" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Nom)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="city">City</label>
+            <InputText @bind-Value="_userToRegister" id="city" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.City)" />
+        </div>
+        <6div class="form-group my-3">
+            <label for="email">Email Adresse</label>
+            <InputText @bind-Value="_userToRegister" id="email" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Email)" />
+        </6div>
+        <div class="form-group my-3">
+            <label for="password">Password</label>
+            <InputText @bind-Value="_userToRegister" id="password" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.Password)" />
+        </div>
+        <div class="form-group my-3">
+            <label for="confirmepassword">ConfirmPassword</label>
+            <InputText @bind-Value="_userToRegister" id="confirmepassword" class="form-contol" />
+            <ValidationMessage For="@(()=>_userToRegister.ConfirmPassword)" />
+        </div>
+*@
